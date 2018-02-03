@@ -1,6 +1,7 @@
 import os
 import time
 import re
+import requests
 from slackclient import SlackClient
 
 
@@ -44,7 +45,14 @@ def handle_command(command, channel):
     # default_response = "Not sure what you mean. Try *{}*.".format(EXAMPLE_COMMAND)
 
     # Finds and executes the given command, filling in response
-    response = command
+    url="http://api.openweathermap.org/data/2.5/weather"
+    payload = {'q': command, 'APPID': '1fbe4e247f298fb96f4a61a7809a93d8', 'units': 'metric'}
+    weather_response = requests.get(url, params=payload)
+    if weather_response.status_code == requests.codes.ok:
+        weather = weather_response.json()
+        response = weather['name'] + '\n' + 'Weather: ' + weather['weather'][0]['description'] + '\n' +  'Current temp: ' + str(weather['main']['temp']) + ' Celsius'
+    else:
+        response = command
     # This is where you start to implement more commands!
     # if command.startswith(EXAMPLE_COMMAND):
     #     response = "Sure...write some more code then I can do that!"
